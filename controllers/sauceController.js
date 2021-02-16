@@ -1,4 +1,5 @@
-const Sauce = require('../models/Sauce');
+const Sauce = require('../models/Sauce').sauceMongoose;
+const fs = require('fs');
 
 exports.index = async (req, res) => {
     Sauce.find()
@@ -34,22 +35,21 @@ exports.delete = (req, res) => {
 
 exports.like = async (req, res) => {
     let sauce = await Sauce.findOne({ _id: req.params.id }).catch(error => res.status(404).json({ error }));
-    const like = req.body.like;
-    const user_id = req.body.userId;
-    let sauce_like = { usersLiked : sauce.usersLiked, usersDisliked : sauce.usersDisliked, likes : sauce.likes, dislikes: sauce.dislikes }
 
-    if (!isValidVote(like, user_id, sauce)) {
-        return res.status(401).json({ error: 'Vous avez déjà voté!' });
+    if (!isValidVote(sauce, req.body.like, req.body.userId )) {
+        return res.status(401).json({ error: new Error('Vous avez déjà voté!') });
     }
 
-    await Sauce.updateOne({_id: req.params.id}, updateLikeSauce(like, user_id, sauce_like));
+    await Sauce.updateOne({_id: req.params.id}, updateLikeSauce(req.body.like, req.body.userId, sauce));
     return res.status(200).json({ message: 'Like update!' });
 }
 
 function defineSauceFromReq(req) {
     if(req.file) {
+        fs.rename(fs.realpathSync(req.file.path), fs.realpathSync(req.file.path).replace('\\temp', ''), (err) => { if (err) throw err; });
+
         return {
-            ...JSON.parse(req.body.sauce),
+            ...JSON.parse(req.body['sauce']),
             imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
         }
     }
@@ -57,7 +57,7 @@ function defineSauceFromReq(req) {
     return { ...req.body }
 }
 
-function isValidVote(like, user_id, sauce) {
+function isValidVote( sauce, like, user_id ) {
     if(like === 1) { return sauce.usersLiked.indexOf(user_id) === -1; }
 
     if(like === -1) { return sauce.usersDisliked.indexOf(user_id) === -1; }
@@ -65,28 +65,28 @@ function isValidVote(like, user_id, sauce) {
     return true;
 }
 
-function updateLikeSauce(like, user_id, sauce_like) {
-    if(sauce_like.usersLiked.indexOf(user_id) !== -1) {
-        sauce_like.likes --;
-        sauce_like.usersLiked = sauce_like.usersLiked.filter(function(value){ return value !== user_id; });
+function updateLikeSauce(like, user_id, sauce) {
+    if(sauce.usersLiked.indexOf(user_id) !== -1) {
+        sauce.likes --;
+        sauce.usersLiked = sauce.usersLiked.filter(function(value){ return value !== user_id; });
     }
 
-    if(sauce_like.usersDisliked.indexOf(user_id) !== -1) {
-        sauce_like.dislikes --;
-        sauce_like.usersDisliked = sauce_like.usersDisliked.filter(function(value){ return value !== user_id; });
+    if(sauce.usersDisliked.indexOf(user_id) !== -1) {
+        sauce.dislikes --;
+        sauce.usersDisliked = sauce.usersDisliked.filter(function(value){ return value !== user_id; });
     }
 
     if(like === 1) {
-        sauce_like.likes ++;
-        sauce_like.usersLiked.push(user_id)
-        return sauce_like;
+        sauce.likes ++;
+        sauce.usersLiked.push(user_id)
+        return sauce;
     }
 
     if(like === -1) {
-        sauce_like.dislikes ++;
-        sauce_like.usersDisliked.push(user_id);
-        return sauce_like;
+        sauce.dislikes ++;
+        sauce.usersDisliked.push(user_id);
+        return sauce;
     }
 
-    return sauce_like;
+    return sauce;
 }

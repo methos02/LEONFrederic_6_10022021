@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
 
 module.exports = async (req, res, next) => {
     try {
@@ -9,9 +8,9 @@ module.exports = async (req, res, next) => {
 
         if (req.body.userId && req.body.userId !== userId) {
             throw 'Invalid user ID';
-        } else {
-            next();
         }
+
+        next();
 
     } catch {
         res.status(401).json({
