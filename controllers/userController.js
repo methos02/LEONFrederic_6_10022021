@@ -24,6 +24,6 @@ exports.login = async (req, res) => {
         return res.status(401).json({ error: 'Utilisateur ou mot de passe incorrect!' });
     }
 
-    const token = jwt.sign( { userId: user._id }, 'RANDOM_TOKEN_SECRET', { expiresIn: '24h' });
+    const token = jwt.sign( { userId: user._id }, process.env.APP_KEY, { expiresIn: '24h' });
     res.status(200).json({ userId: user._id, token: token });
 };

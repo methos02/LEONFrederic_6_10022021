@@ -1,4 +1,5 @@
 const Sauce = require('../models/Sauce').sauceMongoose;
+const imageH = require('../helpers/imageHelper');
 const fs = require('fs');
 
 exports.index = async (req, res) => {
@@ -14,7 +15,7 @@ exports.show = async (req, res) => {
 };
 
 exports.store = async (req, res) => {
-    const sauce = new Sauce(defineSauceFromReq(req));
+    const sauce = new Sauce(req.valideData);
 
     sauce.save()
         .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
@@ -22,15 +23,18 @@ exports.store = async (req, res) => {
 };
 
 exports.update = async  (req, res) => {
-    Sauce.updateOne({ _id: req.params.id }, { ...defineSauceFromReq(req), _id: req.params.id })
+    Sauce.updateOne({ _id: req.params.id }, { ...req.valideData, _id: req.params.id })
         .then(() => res.status(200).json({ message: 'Objet modifié !'}))
         .catch(error => res.status(400).json({ error }));
 }
 
-exports.delete = (req, res) => {
-    Sauce.deleteOne({ _id: req.params.id })
-        .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
-        .catch(error => res.status(400).json({ error }));
+exports.delete = async (req, res) => {
+    const sauce =  await Sauce.findOne({ _id: req.params.id }).catch(error => res.status(404).json({ error }));
+    fs.unlink(imageH.getPathImage(sauce.imageUrl), (err) => { if (err) throw err; });
+
+    sauce.delete()
+         .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
+         .catch(error => res.status(400).json({ error }));
 }
 
 exports.like = async (req, res) => {
@@ -42,19 +46,6 @@ exports.like = async (req, res) => {
 
     await Sauce.updateOne({_id: req.params.id}, updateLikeSauce(req.body.like, req.body.userId, sauce));
     return res.status(200).json({ message: 'Like update!' });
-}
-
-function defineSauceFromReq(req) {
-    if(req.file) {
-        fs.rename(fs.realpathSync(req.file.path), fs.realpathSync(req.file.path).replace('\\temp', ''), (err) => { if (err) throw err; });
-
-        return {
-            ...JSON.parse(req.body['sauce']),
-            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-        }
-    }
-
-    return { ...req.body }
 }
 
 function isValidVote( sauce, like, user_id ) {
