@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
 
-mongoose.connect('mongodb+srv://admin:UjXza3OsqXpvZQzL@cluster0.ekggi.mongodb.net/p6_theHottestReviews?retryWrites=true&w=majority',
+mongoose.connect(process.env.APP_MONGOOSE,
     { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connexion à MongoDB réussie !'))
     .catch((error) => console.log('Connexion à MongoDB échouée ! : ' + error));

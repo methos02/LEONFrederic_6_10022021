@@ -1,7 +1,6 @@
-const User = require('../models/User').userMongoose;
+const User = require('../schema/mongodb/UserMongo');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-//const Str = require('@supercharge/strings')salt: Str.random(50);
 
 exports.signup = async (req, res) => {
     const hash = await bcrypt.hash(req.body.password, 10).catch(error => res.status(500).json({ error }));

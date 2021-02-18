@@ -1,4 +1,4 @@
-const Sauce = require('../models/Sauce').sauceMongoose;
+const Sauce = require('../schema/mongodb/SauceMongo');
 const imageH = require('../helpers/imageHelper');
 const fs = require('fs');
 
@@ -59,12 +59,12 @@ function isValidVote( sauce, like, user_id ) {
 function updateLikeSauce(like, user_id, sauce) {
     if(sauce.usersLiked.indexOf(user_id) !== -1) {
         sauce.likes --;
-        sauce.usersLiked = sauce.usersLiked.filter(function(value){ return value !== user_id; });
+        sauce.usersLiked = sauce.usersLiked.filter(value => value !== user_id );
     }
 
     if(sauce.usersDisliked.indexOf(user_id) !== -1) {
         sauce.dislikes --;
-        sauce.usersDisliked = sauce.usersDisliked.filter(function(value){ return value !== user_id; });
+        sauce.usersDisliked = sauce.usersDisliked.filter(value => value !== user_id );
     }
 
     if(like === 1) {

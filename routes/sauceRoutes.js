@@ -5,7 +5,7 @@ const sauceCtrl = require('../controllers/sauceController');
 const multer = require('../middleware/multer_config');
 const auth = require('../middleware/auth');
 const validateData = require('../middleware/validateData');
-const sauceJoi = require('../models/Sauce').sauceJoi;
+const sauceJoi = require('../schema/joi/SauceJoi');
 
 router.get('/', auth,sauceCtrl.index);
 router.post('/', auth, multer, validateData(sauceJoi, 'sauce'),  sauceCtrl.store);
