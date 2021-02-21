@@ -1,6 +1,10 @@
-function getPathImage( path_image ) {
-    const explode_path = path_image.split('images/')
-    return 'images/' + explode_path[explode_path.length - 1];
+/**
+ * Converti le path temporaire d'une image en path défénitif
+ * @param path_image "Path temporaire pointant sur le dossier image/temp"
+ * @returns {string} "Path défénitive pointant sur le dossier image"
+ */
+function convertPathTempToImage( path_image ) {
+    return path_image.replace('/temp', '');
 }
 
-module.exports = { getPathImage };
+module.exports = { convertPathTempToImage };

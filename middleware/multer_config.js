@@ -1,3 +1,6 @@
+/**
+ * Middleware qui déplace les files de la requête dans le dossier temp .
+ */
 const multer = require('multer');
 
 const MIME_TYPES = {

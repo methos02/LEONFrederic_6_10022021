@@ -1,3 +1,6 @@
+/**
+ * Middleware de restriction de tentative de connection.
+ */
 const rateLimit = require("express-rate-limit");
 
 function login_limiter() {

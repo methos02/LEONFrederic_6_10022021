@@ -1,3 +1,7 @@
+/**
+ * Middleware d'authentification.
+ */
+
 const jwt = require('jsonwebtoken');
 
 module.exports = async (req, res, next) => {
@@ -5,9 +9,9 @@ module.exports = async (req, res, next) => {
     const decodedToken = jwt.verify(token, process.env.APP_KEY);
     const userId = decodedToken.userId;
 
-    if (req.body.userId && req.body.userId === userId) {
-        next();
+    if (req.body.userId && req.body.userId !== userId) {
+        return res.status(401).json({ error: new Error('Invalid request!') });
     }
 
-    return res.status(401).json({ error: new Error('Invalid request!') });
+    next();
 };

@@ -1,3 +1,7 @@
+/**
+ * Schéma de validation Joi pour les Utilisateurs
+ */
+
 const joi = require('joi');
 
 module.exports = joi.object({

@@ -1,3 +1,6 @@
+/**
+ * Schéma de validation mongoose pour les Sauces
+ */
 const mongoose = require('mongoose');
 
 const sauceSchema = mongoose.Schema({
