@@ -3,8 +3,8 @@
  * @param path_image "Path temporaire pointant sur le dossier image/temp"
  * @returns {string} "Path défénitive pointant sur le dossier image"
  */
-function convertPathTempToImage( path_image ) {
-    return path_image.replace('/temp', '');
+function getRelativePath( path_image ) {
+    return path_image.split('localhost:3000/')[1];
 }
 
-module.exports = { convertPathTempToImage };
+module.exports = { getRelativePath };

@@ -45,7 +45,8 @@ exports.update = async  (req, res) => {
  */
 exports.delete = async (req, res) => {
     const sauce =  await Sauce.findOne({ _id: req.params.id }).catch(error => res.status(404).json({ error }));
-    fs.unlink(imageH.convertPathTempToImage(sauce.imageUrl), (err) => { if (err) throw err; });
+
+    fs.unlink(imageH.getRelativePath(sauce.imageUrl) , (err) => { if (err) throw err; });
 
     sauce.delete()
          .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
